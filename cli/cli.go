@@ -37,11 +37,21 @@ func Init() *cobra.Command {
 	}
 	runCmd.Flags().SetInterspersed(false)
 
+	dockerCmd := &cobra.Command{
+		Use:   "docker",
+		Short: "操作docker",
+		Run: func(cmd *cobra.Command, args []string) {
+			nodeRun(cmd, append([]string{"docker"}, args...))
+		},
+	}
+	dockerCmd.Flags().SetInterspersed(false)
+
 	cmd.AddCommand(
 		addCmd,
 		delCmd,
 		listCmd,
 		runCmd,
+		dockerCmd,
 	)
 
 	return cmd
