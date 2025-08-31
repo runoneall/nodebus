@@ -4,14 +4,26 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"path/filepath"
 )
 
+func getConfigPath() string {
+	homePath, err := os.UserHomeDir()
+	if err != nil {
+		panic(err)
+	}
+
+	return filepath.Join(homePath, "nodebus.json")
+}
+
 func (m *Manager) LoadJSON() error {
-	if _, err := os.Stat("nodebus.json"); os.IsNotExist(err) {
+	configPath := getConfigPath()
+
+	if _, err := os.Stat(configPath); os.IsNotExist(err) {
 		return fmt.Errorf("无法加载 json 配置: %v", err)
 	}
 
-	f, err := os.Open("nodebus.json")
+	f, err := os.Open(configPath)
 	if err != nil {
 		return fmt.Errorf("无法打开 json 配置: %v", err)
 	}
@@ -30,7 +42,9 @@ func (m *Manager) LoadJSON() error {
 }
 
 func (m *Manager) SaveJSON() error {
-	f, err := os.Create("nodebus.json")
+	configPath := getConfigPath()
+
+	f, err := os.Create(configPath)
 	if err != nil {
 		return fmt.Errorf("无法创建 json 配置: %v", err)
 	}
