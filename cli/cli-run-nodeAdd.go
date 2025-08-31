@@ -77,8 +77,11 @@ func nodeAdd(cmd *cobra.Command, args []string) {
 		verifys{
 			general_verify,
 			func(input string) bool {
-				if net.ParseIP(input) == nil {
-					fmt.Println("必须是合法的 IP 地址")
+				is_ip := net.ParseIP(input)
+				addrs, _ := net.LookupHost(input)
+
+				if is_ip == nil && len(addrs) == 0 {
+					fmt.Println("请输入正确的 IP 地址或域名")
 					return false
 				}
 				return true
@@ -111,7 +114,12 @@ func nodeAdd(cmd *cobra.Command, args []string) {
 	item_ssh_password := require_input(
 		"SSH 密码 (abcde12345)",
 		verifys{
-			general_verify,
+			func(input string) bool {
+				if input == "" {
+					fmt.Println("将使用无密码登录")
+				}
+				return true
+			},
 		},
 	)
 
