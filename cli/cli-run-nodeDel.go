@@ -11,6 +11,10 @@ func nodeDel(cmd *cobra.Command, args []string) {
 	manager := configm.GetManager()
 	target_deletes := *SelectedNodes
 
+	if *IsAllNode {
+		target_deletes = manager.ItemGetAllName()
+	}
+
 	if len(target_deletes) == 0 {
 		fmt.Println("未选择任何节点")
 		return

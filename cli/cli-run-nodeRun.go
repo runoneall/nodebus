@@ -17,6 +17,10 @@ func nodeRun(cmd *cobra.Command, args []string) {
 	manager := configm.GetManager()
 	target_nodes := *SelectedNodes
 
+	if *IsAllNode {
+		target_nodes = manager.ItemGetAllName()
+	}
+
 	for _, name := range target_nodes {
 		func() {
 			fmt.Printf("\r\n--> 正在连接到 %s\r\n", name)

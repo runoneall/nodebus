@@ -3,6 +3,7 @@ package cli
 import "github.com/spf13/cobra"
 
 var SelectedNodes *[]string
+var IsAllNode *bool
 
 func Init() *cobra.Command {
 	cmd := &cobra.Command{
@@ -11,6 +12,7 @@ func Init() *cobra.Command {
 	}
 
 	SelectedNodes = cmd.PersistentFlags().StringSliceP("node", "n", []string{}, "指定要管理的节点")
+	IsAllNode = cmd.PersistentFlags().Bool("node-all", false, "指定管理全部节点")
 
 	addCmd := &cobra.Command{
 		Use:   "add",

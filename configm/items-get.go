@@ -28,3 +28,14 @@ func (m *Manager) ItemExists(name string) bool {
 
 	return false
 }
+
+func (m *Manager) ItemGetAllName() []string {
+	allItem := m.ItemGetAll()
+
+	keys := make([]string, 0, len(allItem))
+	for k := range allItem {
+		keys = append(keys, k)
+	}
+
+	return keys
+}
