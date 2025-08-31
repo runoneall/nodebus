@@ -7,11 +7,11 @@ import (
 )
 
 func (m *Manager) LoadJSON() error {
-	if _, err := os.Stat("nodes.json"); os.IsNotExist(err) {
+	if _, err := os.Stat("nodebus.json"); os.IsNotExist(err) {
 		return fmt.Errorf("无法加载 json 配置: %v", err)
 	}
 
-	f, err := os.Open("nodes.json")
+	f, err := os.Open("nodebus.json")
 	if err != nil {
 		return fmt.Errorf("无法打开 json 配置: %v", err)
 	}
@@ -30,7 +30,7 @@ func (m *Manager) LoadJSON() error {
 }
 
 func (m *Manager) SaveJSON() error {
-	f, err := os.Create("nodes.json")
+	f, err := os.Create("nodebus.json")
 	if err != nil {
 		return fmt.Errorf("无法创建 json 配置: %v", err)
 	}

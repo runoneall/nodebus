@@ -42,3 +42,11 @@ go build
 ```
 
 其中 `<node1>,<node2>,...` 为要执行命令的节点名称，多个节点名称用 `,` 分隔。`<command>` 为要执行的命令。
+
+6. docker 管理
+
+```shell
+./nodebus --node <node1>,<node2>,... docker <command>
+```
+
+其中 `<node1>,<node2>,...` 为要执行命令的节点名称，多个节点名称用 `,` 分隔。`<command>` 为要执行的命令，支持全部 docker 命令

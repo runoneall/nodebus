@@ -3,6 +3,7 @@ package cli
 import (
 	"bufio"
 	"fmt"
+	"net"
 	"nodebus/configm"
 	"os"
 	"strconv"
@@ -75,6 +76,13 @@ func nodeAdd(cmd *cobra.Command, args []string) {
 		"SSH 主机地址 (127.0.0.1)",
 		verifys{
 			general_verify,
+			func(input string) bool {
+				if net.ParseIP(input) == nil {
+					fmt.Println("必须是合法的 IP 地址")
+					return false
+				}
+				return true
+			},
 		},
 	)
 
@@ -106,6 +114,10 @@ func nodeAdd(cmd *cobra.Command, args []string) {
 			general_verify,
 		},
 	)
+
+	if strings.Contains(item_ssh_host, ":") {
+		item_ssh_host = "[" + item_ssh_host + "]"
+	}
 
 	manager.ItemAdd(configm.Item{
 		Name:         item_name,

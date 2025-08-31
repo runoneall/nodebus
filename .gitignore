@@ -31,4 +31,4 @@ go.work.sum
 # .idea/
 # .vscode/
 
-nodes.json
+nodebus.json
