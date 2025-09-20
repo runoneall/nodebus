@@ -119,7 +119,7 @@ func nodeAdd(cmd *cobra.Command, args []string) {
 		},
 	)
 
-	_item_ssh_port := require_input(
+	item_ssh_port := require_input(
 		"SSH 连接端口", "22", "port",
 
 		verifys{
@@ -133,7 +133,6 @@ func nodeAdd(cmd *cobra.Command, args []string) {
 			},
 		},
 	)
-	item_ssh_port, _ := strconv.Atoi(_item_ssh_port)
 
 	item_ssh_user := require_input(
 		"SSH 登录用户", "root", "user",
@@ -155,10 +154,6 @@ func nodeAdd(cmd *cobra.Command, args []string) {
 			},
 		},
 	)
-
-	if strings.Contains(item_ssh_host, ":") {
-		item_ssh_host = "[" + item_ssh_host + "]"
-	}
 
 	manager.ItemAdd(configm.Item{
 		Name:         item_name,

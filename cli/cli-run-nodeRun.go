@@ -3,6 +3,7 @@ package cli
 import (
 	"context"
 	"fmt"
+	"net"
 	"nodebus/configm"
 	"os"
 	"strings"
@@ -32,10 +33,12 @@ func nodeRun(args []string, isShell bool) {
 
 			client, err := ssh.Dial(
 				"tcp",
-				fmt.Sprintf("%s:%d", item.SSH_Host, item.SSH_Port),
+				net.JoinHostPort(item.SSH_Host, item.SSH_Port),
 				&ssh.ClientConfig{
-					User:            item.SSH_User,
-					Auth:            []ssh.AuthMethod{ssh.Password(item.SSH_Password)},
+					User: item.SSH_User,
+					Auth: []ssh.AuthMethod{
+						ssh.Password(item.SSH_Password),
+					},
 					HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 					Timeout:         time.Minute * 3,
 				},
