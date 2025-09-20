@@ -36,11 +36,22 @@ func nodeRun(args []string, isShell bool) {
 				net.JoinHostPort(item.SSH_Host, item.SSH_Port),
 				&ssh.ClientConfig{
 					User: item.SSH_User,
+
 					Auth: []ssh.AuthMethod{
 						ssh.Password(item.SSH_Password),
+						ssh.KeyboardInteractive(
+							func(user, instruction string, questions []string, echos []bool) (answers []string, err error) {
+								answers = make([]string, len(questions))
+								for i := range questions {
+									answers[i] = item.SSH_Password
+								}
+								return answers, nil
+							},
+						),
 					},
+
 					HostKeyCallback: ssh.InsecureIgnoreHostKey(),
-					Timeout:         time.Minute * 3,
+					Timeout:         3 * time.Minute,
 				},
 			)
 
