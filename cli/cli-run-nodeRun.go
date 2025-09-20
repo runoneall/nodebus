@@ -8,12 +8,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/spf13/cobra"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/term"
 )
 
-func nodeRun(cmd *cobra.Command, args []string) {
+func nodeRun(args []string, isShell bool) {
 	manager := configm.GetManager()
 	target_nodes := *SelectedNodes
 
@@ -21,17 +20,14 @@ func nodeRun(cmd *cobra.Command, args []string) {
 		target_nodes = manager.ItemGetAllName()
 	}
 
+	if isShell && len(target_nodes) > 1 {
+		fmt.Println("在 shell 模式下, 不能指定多个节点")
+		return
+	}
+
 	for _, name := range target_nodes {
 		func() {
 			fmt.Printf("\r\n--> 正在连接到 %s\r\n", name)
-
-			fd := int(os.Stdin.Fd())
-			oldState, err := term.MakeRaw(fd)
-			if err != nil {
-				fmt.Println("不能设置终端状态", err)
-				return
-			}
-			defer term.Restore(fd, oldState)
 
 			item, err := manager.ItemGet(name)
 			if err != nil {
@@ -46,6 +42,7 @@ func nodeRun(cmd *cobra.Command, args []string) {
 					User:            item.SSH_User,
 					Auth:            []ssh.AuthMethod{ssh.Password(item.SSH_Password)},
 					HostKeyCallback: ssh.InsecureIgnoreHostKey(),
+					Timeout:         time.Minute * 3,
 				},
 			)
 
@@ -61,6 +58,14 @@ func nodeRun(cmd *cobra.Command, args []string) {
 				return
 			}
 			defer session.Close()
+
+			fd := int(os.Stdin.Fd())
+			oldState, err := term.MakeRaw(fd)
+			if err != nil {
+				fmt.Println("不能设置终端状态", err)
+				return
+			}
+			defer term.Restore(fd, oldState)
 
 			width, height, err := term.GetSize(fd)
 			if err != nil {
@@ -103,13 +108,27 @@ func nodeRun(cmd *cobra.Command, args []string) {
 			session.Stdout = os.Stdout
 			session.Stderr = os.Stderr
 
-			cmd := strings.Join(args, " ")
-			if cmd == "" {
-				cmd = "sh"
-			}
+			switch isShell {
 
-			if err := session.Run(cmd); err != nil {
-				fmt.Println(err)
+			case true:
+				if err := session.Shell(); err != nil {
+					fmt.Println(err)
+				}
+
+				if err := session.Wait(); err != nil {
+					fmt.Println(err)
+				}
+
+			case false:
+				cmd := strings.Join(args, " ")
+				if cmd == "" {
+					cmd = "sh"
+				}
+
+				if err := session.Run(cmd); err != nil {
+					fmt.Println(err)
+				}
+
 			}
 		}()
 	}

@@ -1,9 +1,11 @@
 package cli
 
 import (
+	"encoding/json"
 	"fmt"
 	"nodebus/configm"
 	"reflect"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -12,15 +14,42 @@ func nodeList(cmd *cobra.Command, args []string) {
 	manager := configm.GetManager()
 	all_node := manager.ItemGetAll()
 
-	for name, item := range all_node {
-		fmt.Printf("* %s\n", name)
+	switch *IsJSONOutput {
 
-		value := reflect.ValueOf(item)
-		for i := 0; i < value.NumField(); i++ {
-			k := value.Type().Field(i).Name
-			v := value.Field(i).Interface()
+	case true:
+		indent := *SetJSONOutputIndent
 
-			fmt.Printf("    - %s: %v\n", k, v)
+		var data []byte
+		var jsonErr error
+
+		switch indent {
+
+		case 0:
+			data, jsonErr = json.Marshal(all_node)
+
+		default:
+			data, jsonErr = json.MarshalIndent(all_node, "", strings.Repeat(" ", indent))
+
 		}
+
+		if jsonErr != nil {
+			panic(fmt.Errorf("不能序列化 json: %v", jsonErr))
+		}
+
+		fmt.Println(string(data))
+
+	case false:
+		for name, item := range all_node {
+			fmt.Printf("* %s\n", name)
+
+			value := reflect.ValueOf(item)
+			for i := 0; i < value.NumField(); i++ {
+				k := value.Type().Field(i).Name
+				v := value.Field(i).Interface()
+
+				fmt.Printf("    - %s: %v\n", k, v)
+			}
+		}
+
 	}
 }

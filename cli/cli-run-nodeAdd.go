@@ -15,17 +15,36 @@ import (
 func nodeAdd(cmd *cobra.Command, args []string) {
 	manager := configm.GetManager()
 
-	require_input := func(prompt string, verifys []func(input string) bool) string {
+	require_input := func(prompt string, default_value string, cli_arg string, verifys []func(input string) bool) string {
+
+		if default_value != "" {
+			prompt = fmt.Sprintf("%s [%s]", prompt, default_value)
+		}
+
+		cli_arg_set := cmd.Flags().Changed(cli_arg)
+		cli_arg_value, _ := cmd.Flags().GetString(cli_arg)
+
 		for {
-			reader := bufio.NewReader(os.Stdin)
-
 			fmt.Print(prompt, ": ")
-			input, err := reader.ReadString('\n')
+			var input string
 
-			if err != nil {
-				panic(err)
+			if cli_arg_set {
+				input = cli_arg_value
+				fmt.Println(input)
+
+			} else {
+				reader := bufio.NewReader(os.Stdin)
+				_input, err := reader.ReadString('\n')
+
+				if err != nil {
+					panic(err)
+				}
+				input = strings.TrimSpace(_input)
 			}
-			input = strings.TrimSpace(input)
+
+			if input == "" {
+				input = default_value
+			}
 
 			verified_cont := 0
 			for _, verify := range verifys {
@@ -35,7 +54,16 @@ func nodeAdd(cmd *cobra.Command, args []string) {
 				verified_cont += 1
 			}
 
+			if verified_cont != len(verifys) && cli_arg_set {
+				fmt.Println("使用 cli (非交互式) 指定错误的值将直接退出")
+				os.Exit(1)
+			}
+
 			if verified_cont == len(verifys) {
+				if input != "" {
+					fmt.Println(" └─", input)
+				}
+
 				return input
 			}
 		}
@@ -59,7 +87,8 @@ func nodeAdd(cmd *cobra.Command, args []string) {
 	type verifys []func(input string) bool
 
 	item_name := require_input(
-		"节点名称 (node0)",
+		"节点名称", "node0", "name",
+
 		verifys{
 			general_verify,
 			func(input string) bool {
@@ -73,7 +102,8 @@ func nodeAdd(cmd *cobra.Command, args []string) {
 	)
 
 	item_ssh_host := require_input(
-		"SSH 主机地址 (127.0.0.1)",
+		"SSH 主机地址", "127.0.0.1", "host",
+
 		verifys{
 			general_verify,
 			func(input string) bool {
@@ -90,7 +120,8 @@ func nodeAdd(cmd *cobra.Command, args []string) {
 	)
 
 	_item_ssh_port := require_input(
-		"SSH 连接端口 (22)",
+		"SSH 连接端口", "22", "port",
+
 		verifys{
 			general_verify,
 			func(input string) bool {
@@ -105,14 +136,16 @@ func nodeAdd(cmd *cobra.Command, args []string) {
 	item_ssh_port, _ := strconv.Atoi(_item_ssh_port)
 
 	item_ssh_user := require_input(
-		"SSH 登录用户 (root)",
+		"SSH 登录用户", "root", "user",
+
 		verifys{
 			general_verify,
 		},
 	)
 
 	item_ssh_password := require_input(
-		"SSH 密码 (abcde12345)",
+		"SSH 密码", "", "pass",
+
 		verifys{
 			func(input string) bool {
 				if input == "" {
