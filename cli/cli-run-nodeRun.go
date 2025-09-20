@@ -20,11 +20,6 @@ func nodeRun(args []string, isShell bool) {
 		target_nodes = manager.ItemGetAllName()
 	}
 
-	if isShell && len(target_nodes) > 1 {
-		fmt.Println("在 shell 模式下, 不能指定多个节点")
-		return
-	}
-
 	for _, name := range target_nodes {
 		func() {
 			fmt.Printf("\r\n--> 正在连接到 %s\r\n", name)
