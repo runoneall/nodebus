@@ -8,12 +8,19 @@ import (
 )
 
 func getConfigPath() string {
-	homePath, err := os.UserHomeDir()
+	configPath, err := os.UserConfigDir()
 	if err != nil {
 		panic(err)
 	}
 
-	return filepath.Join(homePath, "nodebus.json")
+	dirPath := filepath.Join(configPath, "nodebus")
+	if _, err := os.Stat(dirPath); os.IsNotExist(err) {
+		if err := os.MkdirAll(dirPath, 0750); err != nil {
+			panic(err)
+		}
+	}
+
+	return filepath.Join(dirPath, "nodebus.json")
 }
 
 func (m *Manager) LoadJSON() error {
