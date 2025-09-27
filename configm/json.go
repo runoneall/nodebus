@@ -3,6 +3,7 @@ package configm
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 )
@@ -36,8 +37,12 @@ func (m *Manager) LoadJSON() error {
 	}
 	defer f.Close()
 
+	return m.LoadJSONFromReader(f)
+}
+
+func (m *Manager) LoadJSONFromReader(body io.Reader) error {
 	var items map[string]Item
-	if err := json.NewDecoder(f).Decode(&items); err != nil {
+	if err := json.NewDecoder(body).Decode(&items); err != nil {
 		return fmt.Errorf("无法解析 json 配置: %v", err)
 	}
 

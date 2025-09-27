@@ -1,12 +1,20 @@
 package cli
 
-import "github.com/spf13/cobra"
+import (
+	"github.com/spf13/cobra"
+)
 
 var SelectedNodes *[]string
 var IsAllNode *bool
 
+var UseCfgCenter *string
+var CfgCenterAuth *string
+
 var IsJSONOutput *bool
 var SetJSONOutputIndent *int
+
+var CfgCenterHost *string
+var CfgCenterPort *string
 
 func Init() *cobra.Command {
 	cmd := &cobra.Command{
@@ -16,6 +24,9 @@ func Init() *cobra.Command {
 
 	SelectedNodes = cmd.PersistentFlags().StringSliceP("node", "n", []string{}, "指定要管理的节点")
 	IsAllNode = cmd.PersistentFlags().Bool("node-all", false, "指定管理全部节点")
+
+	UseCfgCenter = cmd.PersistentFlags().String("cfgcenter", "", "指定 cfgcenter 服务器")
+	CfgCenterAuth = cmd.PersistentFlags().String("auth", "none", "连接到 cfgcenter 的认证字符串")
 
 	addCmd := &cobra.Command{
 		Use:   "add",
@@ -70,6 +81,15 @@ func Init() *cobra.Command {
 		},
 	}
 
+	cfgCenterCmd := &cobra.Command{
+		Use:   "cfgcenter",
+		Short: "集中式的管理节点配置",
+		Run:   cfgCenterServer,
+	}
+
+	CfgCenterHost = cfgCenterCmd.Flags().String("host", "::", "指定 cfgcenter 的监听地址")
+	CfgCenterPort = cfgCenterCmd.Flags().String("port", "32768", "指定 cfgcenter 的监听端口")
+
 	cmd.AddCommand(
 		addCmd,
 		delCmd,
@@ -77,6 +97,7 @@ func Init() *cobra.Command {
 		runCmd,
 		dockerCmd,
 		shellCmd,
+		cfgCenterCmd,
 	)
 
 	return cmd
