@@ -1,4 +1,4 @@
-package cli
+package fns
 
 import (
 	"bufio"
@@ -12,7 +12,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func nodeAdd(cmd *cobra.Command, args []string) {
+func NodeAdd(cmd *cobra.Command, args []string) {
 	manager := configm.GetManager()
 
 	require_input := func(prompt string, default_value string, cli_arg string, verifys []func(input string) bool) string {

@@ -1,8 +1,9 @@
-package cli
+package fns
 
 import (
 	"fmt"
 	"net"
+	"nodebus/cli"
 	"nodebus/configm"
 	"slices"
 
@@ -10,7 +11,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func cfgCenterServer(cmd *cobra.Command, args []string) {
+func CfgCenterServer(cmd *cobra.Command, args []string) {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
 
@@ -36,7 +37,7 @@ func cfgCenterServer(cmd *cobra.Command, args []string) {
 
 	r.GET("/", func(ctx *gin.Context) {
 		authHeader, ok := ctx.Request.Header["Auth"]
-		if !ok || !slices.Contains(authHeader, *CfgCenterAuth) {
+		if !ok || !slices.Contains(authHeader, *cli.CfgCenterAuth) {
 			ctx.String(401, "unauth")
 			return
 		}
@@ -45,8 +46,8 @@ func cfgCenterServer(cmd *cobra.Command, args []string) {
 	})
 
 	addr := net.JoinHostPort(
-		*CfgCenterHost,
-		*CfgCenterPort,
+		*cli.CfgCenterHost,
+		*cli.CfgCenterPort,
 	)
 	fmt.Println("监听", addr)
 

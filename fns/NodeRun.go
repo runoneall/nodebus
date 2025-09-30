@@ -1,9 +1,10 @@
-package cli
+package fns
 
 import (
 	"context"
 	"fmt"
 	"net"
+	"nodebus/cli"
 	"nodebus/configm"
 	"os"
 	"strings"
@@ -13,11 +14,11 @@ import (
 	"golang.org/x/term"
 )
 
-func nodeRun(args []string, isShell bool) {
+func NodeRun(args []string, isShell bool) {
 	manager := configm.GetManager()
-	target_nodes := *SelectedNodes
+	target_nodes := *cli.SelectedNodes
 
-	if *IsAllNode {
+	if *cli.IsAllNode {
 		target_nodes = manager.ItemGetAllName()
 	}
 

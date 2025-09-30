@@ -1,8 +1,9 @@
-package cli
+package fns
 
 import (
 	"encoding/json"
 	"fmt"
+	"nodebus/cli"
 	"nodebus/configm"
 	"reflect"
 	"strings"
@@ -10,14 +11,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func nodeList(cmd *cobra.Command, args []string) {
+func NodeList(cmd *cobra.Command, args []string) {
 	manager := configm.GetManager()
 	all_node := manager.ItemGetAll()
 
-	switch *IsJSONOutput {
+	switch *cli.IsJSONOutput {
 
 	case true:
-		indent := *SetJSONOutputIndent
+		indent := *cli.SetJSONOutputIndent
 
 		var data []byte
 		var jsonErr error

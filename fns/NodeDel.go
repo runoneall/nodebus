@@ -1,17 +1,18 @@
-package cli
+package fns
 
 import (
 	"fmt"
+	"nodebus/cli"
 	"nodebus/configm"
 
 	"github.com/spf13/cobra"
 )
 
-func nodeDel(cmd *cobra.Command, args []string) {
+func NodeDel(cmd *cobra.Command, args []string) {
 	manager := configm.GetManager()
-	target_deletes := *SelectedNodes
+	target_deletes := *cli.SelectedNodes
 
-	if *IsAllNode {
+	if *cli.IsAllNode {
 		target_deletes = manager.ItemGetAllName()
 	}
 
