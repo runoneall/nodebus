@@ -8,9 +8,7 @@ import (
 	_ "go.nanomsg.org/mangos/v3/transport/all"
 )
 
-func Connect(
-	ipcName string,
-) protocol.Socket {
+func Connect(ipcName string) protocol.Socket {
 	filePath := getIPCFile(ipcName)
 
 	sock, err := req.NewSocket()
