@@ -1,56 +1,40 @@
 package fns
 
 import (
-	"crypto/tls"
+	"bytes"
 	"fmt"
-	"io"
-	"net/http"
 	"nodebus/cli"
 	"nodebus/configm"
+	"nodebus/ipc"
 
 	"github.com/spf13/cobra"
 )
 
 func PersistentPreRun(cmd *cobra.Command, args []string) {
-	config_manager := configm.GetManager()
-	cfgCenterServer := *cli.UseCfgCenter
+	configManager := configm.GetManager()
 
-	if cfgCenterServer == "" {
-		config_manager.LoadJSON()
+	switch *cli.UseCfgCenter {
 
-	} else {
-		client := &http.Client{Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		}}
+	case false:
+		if err := configManager.LoadJSON(); err != nil {
+			panic(fmt.Errorf("不能加载文件: %v", err))
+		}
 
-		req, err := http.NewRequest("GET", fmt.Sprintf("https://%s", cfgCenterServer), nil)
+	case true:
+		conn := ipc.Connect("cfgcenter")
+		defer conn.Close()
+
+		if err := conn.Send([]byte("fetch")); err != nil {
+			panic(fmt.Errorf("不能发送请求: %v", err))
+		}
+
+		resp, err := conn.Recv()
 		if err != nil {
-			panic(fmt.Errorf("不能创建请求: %v", err))
+			panic(fmt.Errorf("不能接收响应: %v", err))
 		}
 
-		req.Header.Add("Auth", *cli.CfgCenterAuth)
-		resp, err := client.Do(req)
-		if err != nil {
-			req.URL.Scheme = "http"
-
-			resp, err = client.Do(req)
-			if err != nil {
-				panic(fmt.Errorf("不能请求 cfgcenter 服务器: %v", err))
-			}
-		}
-		defer resp.Body.Close()
-
-		if resp.StatusCode != http.StatusOK {
-			body, err := io.ReadAll(resp.Body)
-			if err != nil {
-				panic(fmt.Errorf("不能读取 cfgcenter 响应"))
-			}
-
-			panic(fmt.Errorf("cfgcenter 拒绝了获取请求: %s", string(body)))
-		}
-
-		if err := config_manager.LoadJSONFromReader(resp.Body); err != nil {
-			panic(fmt.Errorf("不能解析 cfgcenter 响应: %v", err))
+		if err := configManager.LoadJSONFromReader(bytes.NewReader(resp)); err != nil {
+			panic(fmt.Errorf("不能反序列化配置: %v", err))
 		}
 
 	}

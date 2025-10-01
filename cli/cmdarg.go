@@ -3,21 +3,16 @@ package cli
 var SelectedNodes *[]string
 var IsAllNode *bool
 
-var UseCfgCenter *string
-var CfgCenterAuth *string
+var UseCfgCenter *bool
 
 var IsJSONOutput *bool
 var SetJSONOutputIndent *int
-
-var CfgCenterHost *string
-var CfgCenterPort *string
 
 func initCmdArg() {
 	SelectedNodes = Cmd.PersistentFlags().StringSliceP("node", "n", []string{}, "指定要管理的节点")
 	IsAllNode = Cmd.PersistentFlags().Bool("node-all", false, "指定管理全部节点")
 
-	UseCfgCenter = Cmd.PersistentFlags().String("cfgcenter", "", "指定 cfgcenter 服务器")
-	CfgCenterAuth = Cmd.PersistentFlags().String("auth", "none", "认证字符串")
+	UseCfgCenter = Cmd.PersistentFlags().Bool("cfgcenter", false, "从 cfgcenter 服务器拉取配置")
 
 	AddCmd.Flags().String("name", "", "指定节点名称")
 	AddCmd.Flags().String("host", "", "指定连接地址")
@@ -30,7 +25,4 @@ func initCmdArg() {
 
 	RunCmd.Flags().SetInterspersed(false)
 	DockerCmd.Flags().SetInterspersed(false)
-
-	CfgCenterHost = CfgCenterCmd.Flags().String("host", "::", "指定 cfgcenter 的监听地址")
-	CfgCenterPort = CfgCenterCmd.Flags().String("port", "32768", "指定 cfgcenter 的监听端口")
 }
