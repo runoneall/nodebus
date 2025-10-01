@@ -3,10 +3,10 @@ module nodebus
 go 1.25.1
 
 require (
+	github.com/containerd/console v1.0.5
 	github.com/gin-gonic/gin v1.11.0
 	github.com/spf13/cobra v1.10.1
 	golang.org/x/crypto v0.42.0
-	golang.org/x/term v0.35.0
 )
 
 require (

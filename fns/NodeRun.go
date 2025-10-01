@@ -10,8 +10,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/containerd/console"
+
 	"golang.org/x/crypto/ssh"
-	"golang.org/x/term"
 )
 
 func NodeRun(args []string, isShell bool) {
@@ -69,21 +70,30 @@ func NodeRun(args []string, isShell bool) {
 			}
 			defer session.Close()
 
-			fd := int(os.Stdin.Fd())
-			oldState, err := term.MakeRaw(fd)
-			if err != nil {
+			current := console.Current()
+			defer current.Reset()
+
+			if err := current.SetRaw(); err != nil {
 				fmt.Println("不能设置终端状态", err)
 				return
 			}
-			defer term.Restore(fd, oldState)
 
-			width, height, err := term.GetSize(fd)
+			getTermSize := func() (uint16, uint16, error) {
+				size, err := current.Size()
+				if err != nil {
+					return 0, 0, err
+				}
+
+				return size.Width, size.Height, nil
+			}
+
+			width, height, err := getTermSize()
 			if err != nil {
 				fmt.Println("不能获取终端大小", err)
 				return
 			}
 
-			if err := session.RequestPty("xterm", height, width, ssh.TerminalModes{
+			if err := session.RequestPty("xterm", int(height), int(width), ssh.TerminalModes{
 				ssh.ECHO:          1,
 				ssh.TTY_OP_ISPEED: 14400,
 				ssh.TTY_OP_OSPEED: 14400,
@@ -102,11 +112,11 @@ func NodeRun(args []string, isShell bool) {
 				for {
 					select {
 					case <-ticker.C:
-						width, height, err := term.GetSize(fd)
+						width, height, err := getTermSize()
 						if err != nil {
 							continue
 						}
-						session.WindowChange(height, width)
+						session.WindowChange(int(height), int(width))
 
 					case <-winch_ctx.Done():
 						return
