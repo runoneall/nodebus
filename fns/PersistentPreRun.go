@@ -16,9 +16,7 @@ func PersistentPreRun(cmd *cobra.Command, args []string) {
 	switch *cli.UseCfgCenter {
 
 	case false:
-		if err := configManager.LoadJSON(); err != nil {
-			panic(fmt.Errorf("不能加载文件: %v", err))
-		}
+		configManager.LoadJSON()
 
 	case true:
 		conn := ipc.Connect("cfgcenter")

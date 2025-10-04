@@ -70,6 +70,12 @@ func NodeRun(args []string, isShell bool) {
 			}
 			defer session.Close()
 
+			if *cli.UseX11 {
+				if err := X11Forward(client, session); err != nil {
+					fmt.Println("不能启动 X11 转发", err)
+				}
+			}
+
 			current := console.Current()
 			defer current.Reset()
 

@@ -2,6 +2,7 @@ package cli
 
 var SelectedNodes *[]string
 var IsAllNode *bool
+var UseX11 *bool
 
 var UseCfgCenter *bool
 
@@ -11,6 +12,7 @@ var SetJSONOutputIndent *int
 func initCmdArg() {
 	SelectedNodes = Cmd.PersistentFlags().StringSliceP("node", "n", []string{}, "指定要管理的节点")
 	IsAllNode = Cmd.PersistentFlags().Bool("node-all", false, "指定管理全部节点")
+	UseX11 = Cmd.PersistentFlags().Bool("x11", false, "启用 X11 转发")
 
 	UseCfgCenter = Cmd.PersistentFlags().Bool("cfgcenter", false, "从 cfgcenter 服务器拉取配置")
 

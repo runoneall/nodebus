@@ -3,6 +3,7 @@ module nodebus
 go 1.25.1
 
 require (
+	github.com/blacknon/go-x11auth v0.1.0
 	github.com/containerd/console v1.0.5
 	github.com/spf13/cobra v1.10.1
 	go.nanomsg.org/mangos/v3 v3.4.2
