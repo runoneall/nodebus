@@ -30,7 +30,7 @@ func X11Forward(
 	if xauthorityPath == "" {
 		home := os.Getenv("HOME")
 		if home == "" {
-			return fmt.Errorf("xauthority not found: $XAUTHORITY, $HOME not set")
+			return fmt.Errorf(".Xauthority not found: $XAUTHORITY, $HOME not set")
 		}
 		xauthorityPath = filepath.Join(home, ".Xauthority")
 	}
