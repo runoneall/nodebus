@@ -28,11 +28,17 @@ func X11Forward(
 ) error {
 	xauthorityPath := os.Getenv("XAUTHORITY")
 	if xauthorityPath == "" {
-		home := os.Getenv("HOME")
-		if home == "" {
-			return fmt.Errorf(".Xauthority not found: $XAUTHORITY, $HOME not set")
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return fmt.Errorf("无法找到 .Xauthority 文件: %v", err)
 		}
 		xauthorityPath = filepath.Join(home, ".Xauthority")
+	}
+
+	if _, err := os.Stat(xauthorityPath); os.IsNotExist(err) {
+		if _, err := os.Create(xauthorityPath); err != nil {
+			return fmt.Errorf("不能创建 .Xauthority 文件: %v", err)
+		}
 	}
 
 	xa := xauth.XAuth{}
