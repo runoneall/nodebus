@@ -108,11 +108,13 @@ func x11forwarder(channel ssh.Channel) {
 
 	var wg sync.WaitGroup
 	wg.Add(2)
+
 	go func() {
 		io.Copy(conn, channel)
 		conn.Close()
 		wg.Done()
 	}()
+
 	go func() {
 		io.Copy(channel, conn)
 		channel.CloseWrite()
