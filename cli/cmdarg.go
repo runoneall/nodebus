@@ -16,7 +16,7 @@ func initCmdArg() {
 	IsAllNode = Cmd.PersistentFlags().Bool("node-all", false, "指定管理全部节点")
 
 	UseX11 = Cmd.PersistentFlags().Bool("x11", false, "启用 X11 转发")
-	TrustX11 = Cmd.PersistentFlags().Bool("trust-x11", false, "完全信任 X11")
+	TrustX11 = Cmd.PersistentFlags().Bool("trust-x11", false, "完全信任 X11 (绕过 xauth)")
 
 	UseCfgCenter = Cmd.PersistentFlags().Bool("cfgcenter", false, "从 cfgcenter 服务器拉取配置")
 
