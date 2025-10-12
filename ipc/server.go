@@ -38,6 +38,6 @@ func Serv(
 			}
 		}
 
-		go onRecv(data, responder)
+		onRecv(data, responder)
 	}
 }
