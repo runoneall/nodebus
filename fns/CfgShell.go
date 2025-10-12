@@ -42,6 +42,10 @@ func CfgShell(cmd *cobra.Command, args []string) {
 			}
 			input = strings.TrimSpace(input)
 
+			if input == "" {
+				continue
+			}
+
 			fmt.Println(execute(input))
 		}
 	}
