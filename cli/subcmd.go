@@ -37,6 +37,11 @@ var CfgCenterCmd = &cobra.Command{
 	Short: "集中式的管理节点配置",
 }
 
+var CfgShellCmd = &cobra.Command{
+	Use:   "cfgshell",
+	Short: "与 cfgcenter 交互的 shell",
+}
+
 func initSubCmd() {
 	Cmd.AddCommand(
 		AddCmd,
@@ -46,5 +51,6 @@ func initSubCmd() {
 		DockerCmd,
 		ShellCmd,
 		CfgCenterCmd,
+		CfgShellCmd,
 	)
 }

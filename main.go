@@ -20,6 +20,7 @@ func main() {
 	cli.DockerCmd.Run = func(cmd *cobra.Command, args []string) { fns.NodeRun(append([]string{"docker"}, args...), false) }
 	cli.ShellCmd.Run = func(cmd *cobra.Command, args []string) { fns.NodeRun(args, true) }
 	cli.CfgCenterCmd.Run = fns.CfgCenterServer
+	cli.CfgShellCmd.Run = fns.CfgShell
 
 	if err := cmd.Execute(); err != nil {
 		fmt.Println(err)

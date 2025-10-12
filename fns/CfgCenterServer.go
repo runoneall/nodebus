@@ -37,6 +37,9 @@ func CfgCenterServer(cmd *cobra.Command, args []string) {
 
 			responder([]byte("success"))
 
+		default:
+			raise(fmt.Sprintf("未知命令: %s", command))
+
 		}
 	})
 }

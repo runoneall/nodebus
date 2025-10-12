@@ -11,6 +11,8 @@ var UseCfgCenter *bool
 var IsJSONOutput *bool
 var SetJSONOutputIndent *int
 
+var CfgShellExec *[]string
+
 func initCmdArg() {
 	SelectedNodes = Cmd.PersistentFlags().StringSliceP("node", "n", []string{}, "指定要管理的节点")
 	IsAllNode = Cmd.PersistentFlags().Bool("node-all", false, "指定管理全部节点")
@@ -31,4 +33,6 @@ func initCmdArg() {
 
 	RunCmd.Flags().SetInterspersed(false)
 	DockerCmd.Flags().SetInterspersed(false)
+
+	CfgShellExec = CfgShellCmd.Flags().StringSliceP("exec", "c", []string{}, "以非交互模式运行命令")
 }
