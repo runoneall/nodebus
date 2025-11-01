@@ -3,31 +3,28 @@ package fns
 import (
 	"bufio"
 	"fmt"
+	"io"
+	"net"
 	"nodebus/cli"
-	"nodebus/ipc"
 	"os"
 	"strings"
 
+	ipcclient "github.com/runoneall/pgoipc/client"
 	"github.com/spf13/cobra"
 )
 
 func CfgShell(cmd *cobra.Command, args []string) {
 	cmds := *cli.CfgShellExec
 
-	conn := ipc.Connect("cfgcenter")
-	defer conn.Close()
+	execute := func(input string) {
+		ipcclient.Connect("nodebus-cfgcenter", func(conn net.Conn) {
+			if _, err := fmt.Fprintln(conn, input); err != nil {
+				panic(fmt.Errorf("不能发送请求: %v", err))
+			}
 
-	execute := func(input string) string {
-		if err := conn.Send([]byte(input)); err != nil {
-			panic(fmt.Errorf("不能发送请求: %v", err))
-		}
-
-		output, err := conn.Recv()
-		if err != nil {
-			panic(fmt.Errorf("不能获取输出: %v", err))
-		}
-
-		return string(output)
+			io.Copy(os.Stdout, conn)
+			fmt.Println("")
+		})
 	}
 
 	startShell := func() {
@@ -46,7 +43,7 @@ func CfgShell(cmd *cobra.Command, args []string) {
 				continue
 			}
 
-			fmt.Println(execute(input))
+			execute(input)
 		}
 	}
 
@@ -57,8 +54,9 @@ func CfgShell(cmd *cobra.Command, args []string) {
 
 	default:
 		for _, command := range cmds {
-			fmt.Println(execute(command))
+			execute(command)
 		}
 
 	}
+
 }
